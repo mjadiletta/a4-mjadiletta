@@ -6,25 +6,24 @@ import { getCurrentState } from './state';
 
 const Constants = require('../shared/constants');
 
-const { PLAYER_RADIUS, PLAYER_MAX_HP, BULLET_RADIUS, MAP_SIZE } = Constants;
+const { PLAYER_RADIUS, PLAYER_MAX_HP, BULLET_RADIUS, MAP_SIZE_X, MAP_SIZE_Y, OBSTACLE_WIDTH, OBSTACLE_HEIGHT} = Constants;
 
 // Get the canvas graphics context
 const canvas = document.getElementById('game-canvas');
 const context = canvas.getContext('2d');
 setCanvasDimensions();
 
-function setCanvasDimensions() {
-  // On small screens (e.g. phones), we want to "zoom out" so players can still see at least
-  // 800 in-game units of width.
-  const scaleRatio = Math.max(1, 800 / window.innerWidth);
-  canvas.width = scaleRatio * window.innerWidth;
-  canvas.height = scaleRatio * window.innerHeight;
-}
-
 window.addEventListener('resize', debounce(40, setCanvasDimensions));
 
+function setCanvasDimensions() {
+  const scaleRatio = Math.max(1, 800 / window.innerWidth);
+  canvas.width = window.innerWidth; //scaleRatio * window.innerWidth;
+  canvas.height = window.innerHeight; //scaleRatio * window.innerHeight;
+}
+
 function render() {
-  const { me, others, bullets } = getCurrentState();
+  const { me, others, bullets, obstacles } = getCurrentState();
+  
   if (!me) {
     return;
   }
@@ -35,28 +34,27 @@ function render() {
   // Draw boundaries
   context.strokeStyle = 'black';
   context.lineWidth = 1;
-  context.strokeRect(canvas.width / 2 - me.x, canvas.height / 2 - me.y, MAP_SIZE, MAP_SIZE);
+  context.strokeRect(canvas.width/2-MAP_SIZE_X/2, canvas.height/2-MAP_SIZE_Y/2, MAP_SIZE_X, MAP_SIZE_Y);
 
-  // Draw all bullets
-  bullets.forEach(renderBullet.bind(null, me));
-
-  // Draw all players
+  // Draw objects on canvas
   renderPlayer(me, me);
   others.forEach(renderPlayer.bind(null, me));
+  bullets.forEach(renderBullet.bind(null, me));
+  obstacles.forEach(renderObstacle.bind(null, me));
 }
 
 function renderBackground(x, y) {
-  const backgroundX = MAP_SIZE / 2 - x + canvas.width / 2;
-  const backgroundY = MAP_SIZE / 2 - y + canvas.height / 2;
+  const backgroundX = canvas.width / 2;
+  const backgroundY = canvas.height / 2;
   const backgroundGradient = context.createRadialGradient(
     backgroundX,
     backgroundY,
-    MAP_SIZE / 10,
+    canvas.height/2 / 10,
     backgroundX,
     backgroundY,
-    MAP_SIZE / 2,
+    canvas.height / 2,
   );
-  backgroundGradient.addColorStop(0, 'black');
+  backgroundGradient.addColorStop(0, 'blue');
   backgroundGradient.addColorStop(1, 'gray');
   context.fillStyle = backgroundGradient;
   context.fillRect(0, 0, canvas.width, canvas.height);
@@ -65,15 +63,17 @@ function renderBackground(x, y) {
 // Renders a ship at the given coordinates
 function renderPlayer(me, player) {
   const { x, y, direction } = player;
-  const canvasX = canvas.width / 2 + x - me.x;
-  const canvasY = canvas.height / 2 + y - me.y;
+  const canvasX = x + (canvas.width/2-MAP_SIZE_X/2); //canvas.width / 2 ;//+ x; - me.x;
+  const canvasY = y + (canvas.height/2-MAP_SIZE_Y/2); //canvas.height / 2;//+ y; - me.y;
+  updateHealth(me.hp);
 
   // Draw ship
   context.save();
   context.translate(canvasX, canvasY);
+    
   context.rotate(direction);
   context.drawImage(
-    getAsset('ship.svg'),
+    getAsset(document.getElementById('health_header').value),
     -PLAYER_RADIUS,
     -PLAYER_RADIUS,
     PLAYER_RADIUS * 2,
@@ -98,21 +98,48 @@ function renderPlayer(me, player) {
   );
 }
 
+function updateHealth(hp) {
+	document.getElementById('health_number').innerHTML = '<center>- ' + hp + ' -</center>';
+}	
+
 function renderBullet(me, bullet) {
   const { x, y } = bullet;
   context.drawImage(
     getAsset('bullet.svg'),
-    canvas.width / 2 + x - me.x - BULLET_RADIUS,
-    canvas.height / 2 + y - me.y - BULLET_RADIUS,
+	 x + (canvas.width/2-MAP_SIZE_X/2),
+	 y + (canvas.height/2-MAP_SIZE_Y/2), 
     BULLET_RADIUS * 2,
     BULLET_RADIUS * 2,
   );
 }
 
+function renderObstacle(me, obstacle) {
+  const { x, y, direction, width, height } = obstacle;
+  const cX = x + (canvas.width/2-MAP_SIZE_X/2); 
+  const cY = y + (canvas.height/2-MAP_SIZE_Y/2); 
+  
+  context.save();
+  
+  context.translate(cX, cY);
+  context.rotate(direction);
+  
+  context.drawImage(
+    getAsset('basic_obsticle.png'),
+	 0,
+	 0,
+    width,
+    height,
+  );
+  //context.rotate(0);
+  //context.translate(-cX, -cY);
+  context.restore();
+
+}
+
 function renderMainMenu() {
   const t = Date.now() / 7500;
-  const x = MAP_SIZE / 2 + 800 * Math.cos(t);
-  const y = MAP_SIZE / 2 + 800 * Math.sin(t);
+  const x = MAP_SIZE_X / 2 + 800 * Math.cos(t);
+  const y = MAP_SIZE_Y / 2 + 800 * Math.sin(t);
   renderBackground(x, y);
 }
 

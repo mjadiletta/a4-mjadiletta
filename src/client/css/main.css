@@ -60,6 +60,7 @@ button:focus {
   font-size: 18px;
   outline: none;
   border: none;
+  border-top: 1px solid black;
   border-bottom: 1px solid black;
   margin-bottom: 5px;
   padding: 3px;
@@ -77,6 +78,7 @@ button:focus {
   background-color: rgba(255, 255, 255, 0.5);
   padding: 10px;
   border-radius: 5px;
+  font-size: 1.2em;
 }
 
 #leaderboard th {
@@ -87,6 +89,22 @@ button:focus {
 #leaderboard td {
   text-align: center;
   padding: 2px 5px;
+}
+
+#health {
+	position: fixed;
+	bottom: 10px;
+	right: 10px;
+	background-color: rgba(255, 255, 255, 0.5);
+	padding: 10px;
+	bordor-radius: 50px;
+	font-size: 1.8em;
+	padding: 10px;
+}
+
+select {
+	padding: 7px;
+	margin: 0px 0px 10px 5px;
 }
 
 #disconnect-modal {

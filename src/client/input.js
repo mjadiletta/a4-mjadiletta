@@ -1,31 +1,86 @@
-// Learn more about this file at:
-// https://victorzhou.com/blog/build-an-io-game-part-1/#6-client-input-%EF%B8%8F
-import { updateDirection } from './networking';
+import { updateUser } from './networking';
+const Constants = require('../shared/constants');
+const canvas = document.getElementById('game-canvas');
 
-function onMouseInput(e) {
-  handleInput(e.clientX, e.clientY);
+let drive = 0; // 1 = forward, -1 = backward
+let direction = 0; // in degrees
+let shoot = 0; // 1 = shoot, 0 = don't shoot
+
+var keyState = {};    
+
+function gameLoop() {
+	if ( keyState[37] ){ // turn left
+		if ( keyState[38] || keyState[40] ) {// turn while forward
+			direction -= Constants.PLAYER_TURN_DEGREES;
+			if(direction < 0){direction = direction + 360;}
+		}
+		else{
+			direction -= 1.8*Constants.PLAYER_TURN_DEGREES;
+			if(direction < 0){direction = direction + 360;}
+		}
+	}
+	
+	if ( keyState[39] ){ // turn right
+		if ( keyState[38] || keyState[40] ) {// turn while forward
+			direction += Constants.PLAYER_TURN_DEGREES;
+			if(direction > 360 ){direction = direction - 360;}
+		}
+		else{
+			direction += 1.8*Constants.PLAYER_TURN_DEGREES;
+			if(direction > 360 ){direction = direction - 360;}
+		}
+	}
+	
+	if ( keyState[38] || keyState[40]){ // drive
+		if ( keyState[38] ) {
+			drive = 1;
+		}
+		else{
+			drive = -1;
+		}
+	}
+	else{
+		drive = 0;
+	}
+	
+	if( keyState[32] ){		// do space function
+		shoot = 1;
+	}
+	else{
+		shoot = 0;
+	}
+
+	handleInput({'direction': convertDirection(direction), drive, shoot});
+
+    // redraw/reposition your object here
+    // also redraw/animate any objects not controlled by the user
+
+    setTimeout(gameLoop, 20);
+}  
+gameLoop();
+
+function handleInput(dir){
+  updateUser(dir);
 }
 
-function onTouchInput(e) {
-  const touch = e.touches[0];
-  handleInput(touch.clientX, touch.clientY);
+function convertDirection(direction){
+	return direction*3.1415/180;
 }
 
-function handleInput(x, y) {
-  const dir = Math.atan2(x - window.innerWidth / 2, window.innerHeight / 2 - y);
-  updateDirection(dir);
+function onKeyboardInputStart(e){
+	keyState[e.keyCode || e.which] = true;
+}
+
+function onKeyboardInputStop(e){
+	keyState[e.keyCode || e.which] = false;
 }
 
 export function startCapturingInput() {
-  window.addEventListener('mousemove', onMouseInput);
-  window.addEventListener('click', onMouseInput);
-  window.addEventListener('touchstart', onTouchInput);
-  window.addEventListener('touchmove', onTouchInput);
+	window.addEventListener('keydown', onKeyboardInputStart,true);    
+	window.addEventListener('keyup', onKeyboardInputStop,true);
 }
 
 export function stopCapturingInput() {
-  window.removeEventListener('mousemove', onMouseInput);
-  window.removeEventListener('click', onMouseInput);
-  window.removeEventListener('touchstart', onTouchInput);
-  window.removeEventListener('touchmove', onTouchInput);
+  window.removeEventListener('keydown', onKeyboardInputStart);
+  window.removeEventListener('keyup', onKeyboardInputStop);
 }
