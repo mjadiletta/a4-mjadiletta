@@ -2,6 +2,8 @@ const express = require('express');
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const socketio = require('socket.io');
+const helmet = require('helmet');
+const compression = require('compression');
 
 const Constants = require('../shared/constants');
 const Game = require('./game');
@@ -9,6 +11,8 @@ const webpackConfig = require('../../webpack.dev.js');
 
 // Setup an Express server
 const app = express();
+app.use(helmet());
+app.use(compression());
 app.use(express.static('public'));
 
 if (process.env.NODE_ENV === 'development') {
@@ -40,8 +44,8 @@ io.on('connection', socket => {
 // Setup the Game
 const game = new Game();
 
-function joinGame(username) {
-  game.addPlayer(this, username);
+function joinGame(username, image) {
+  game.addPlayer(this, username, image);
 }
 
 function handleInput(dir) {

@@ -1,83 +1,84 @@
 import { updateUser } from './networking';
+
 const Constants = require('../shared/constants');
+
 const canvas = document.getElementById('game-canvas');
 
 let drive = 0; // 1 = forward, -1 = backward
 let direction = 0; // in degrees
 let shoot = 0; // 1 = shoot, 0 = don't shoot
 
-var keyState = {};    
+const keyState = {};
 
 function gameLoop() {
-	if ( keyState[37] ){ // turn left
-		if ( keyState[38] || keyState[40] ) {// turn while forward
-			direction -= Constants.PLAYER_TURN_DEGREES;
-			if(direction < 0){direction = direction + 360;}
-		}
-		else{
-			direction -= 1.8*Constants.PLAYER_TURN_DEGREES;
-			if(direction < 0){direction = direction + 360;}
-		}
-	}
-	
-	if ( keyState[39] ){ // turn right
-		if ( keyState[38] || keyState[40] ) {// turn while forward
-			direction += Constants.PLAYER_TURN_DEGREES;
-			if(direction > 360 ){direction = direction - 360;}
-		}
-		else{
-			direction += 1.8*Constants.PLAYER_TURN_DEGREES;
-			if(direction > 360 ){direction = direction - 360;}
-		}
-	}
-	
-	if ( keyState[38] || keyState[40]){ // drive
-		if ( keyState[38] ) {
-			drive = 1;
-		}
-		else{
-			drive = -1;
-		}
-	}
-	else{
-		drive = 0;
-	}
-	
-	if( keyState[32] ){		// do space function
-		shoot = 1;
-	}
-	else{
-		shoot = 0;
-	}
+  if (keyState[37]) { // turn left
+    if (keyState[38] || keyState[40]) { // turn while forward
+      direction -= Constants.PLAYER_TURN_DEGREES;
+      if (direction < 0) { direction += 360; }
+    } else {
+      direction -= 1.8 * Constants.PLAYER_TURN_DEGREES;
+      if (direction < 0) { direction += 360; }
+    }
+  }
 
-	handleInput({'direction': convertDirection(direction), drive, shoot});
+  if (keyState[39]) { // turn right
+    if (keyState[38] || keyState[40]) { // turn while forward
+      direction += Constants.PLAYER_TURN_DEGREES;
+      if (direction > 360) { direction -= 360; }
+    } else {
+      direction += 1.8 * Constants.PLAYER_TURN_DEGREES;
+      if (direction > 360) { direction -= 360; }
+    }
+  }
 
-    // redraw/reposition your object here
-    // also redraw/animate any objects not controlled by the user
+  if (keyState[38] || keyState[40]) { // drive
+    if (keyState[38]) {
+      drive = 1;
+    } else {
+      drive = -1;
+    }
+  } else {
+    drive = 0;
+  }
 
-    setTimeout(gameLoop, 20);
-}  
+  if (keyState[32]) {		// do space function
+    shoot = 1;
+  } else {
+    shoot = 0;
+  }
+
+  if (keyState[81]) {
+    instructions();
+  }
+
+  handleInput({ direction: convertDirection(direction), drive, shoot });
+
+  // redraw/reposition your object here
+  // also redraw/animate any objects not controlled by the user
+
+  setTimeout(gameLoop, 20);
+}
 gameLoop();
 
-function handleInput(dir){
+function handleInput(dir) {
   updateUser(dir);
 }
 
-function convertDirection(direction){
-	return direction*3.1415/180;
+function convertDirection(direction) {
+  return direction * 3.1415 / 180;
 }
 
-function onKeyboardInputStart(e){
-	keyState[e.keyCode || e.which] = true;
+function onKeyboardInputStart(e) {
+  keyState[e.keyCode || e.which] = true;
 }
 
-function onKeyboardInputStop(e){
-	keyState[e.keyCode || e.which] = false;
+function onKeyboardInputStop(e) {
+  keyState[e.keyCode || e.which] = false;
 }
 
 export function startCapturingInput() {
-	window.addEventListener('keydown', onKeyboardInputStart,true);    
-	window.addEventListener('keyup', onKeyboardInputStop,true);
+  window.addEventListener('keydown', onKeyboardInputStart, true);
+  window.addEventListener('keyup', onKeyboardInputStop, true);
 }
 
 export function stopCapturingInput() {

@@ -16,7 +16,7 @@ class Game {
     setInterval(this.update.bind(this), 1000 / 60);
   }
 
-  createObstacles(){
+  createObstacles() {
   	 this.obstacle_list[0] = new Obstacle(100, 100, 0, 300, 25);
  	 this.obstacle_list[1] = new Obstacle(100, 500, 30, 300, 25);
 	 this.obstacle_list[2] = new Obstacle(100, 500, -10, 300, 50);
@@ -27,10 +27,10 @@ class Game {
 	 this.obstacle_list[7] = new Obstacle(1000, 200, 0, 200, 25);
 	 this.obstacle_list[8] = new Obstacle(900, 600, 0, 200, 25);
   }
-  
-  addPlayer(socket, username) {
+
+  addPlayer(socket, username, image) {
     this.sockets[socket.id] = socket;
-	 
+
 	 let x = 0;
 	 let y = 0;
 	 let found_free = true;
@@ -38,16 +38,15 @@ class Game {
 	 	 found_free = true;
 		 x = Constants.MAP_SIZE_X * (Math.random());
 		 y = Constants.MAP_SIZE_Y * (Math.random());
-		 for(let i = 0; i < this.obstacle_list.length; i++){
-			if(this.obstacle_list[i].containsPoint(x + 15, y) || 
+		 for (let i = 0; i < this.obstacle_list.length; i++) {
+        if (this.obstacle_list[i].containsPoint(x + 15, y) ||
 			   this.obstacle_list[i].containsPoint(x - 15, y) ||
 			   this.obstacle_list[i].containsPoint(x, y + 15) ||
-			   this.obstacle_list[i].containsPoint(x, y - 15))
-			{found_free = false;}
+			   this.obstacle_list[i].containsPoint(x, y - 15)) { found_free = false; }
 		 }
-	 } while (found_free === false)
-	 
-    this.players[socket.id] = new Player(socket.id, username, x, y, this.obstacle_list);
+	 } while (found_free === false);
+
+    this.players[socket.id] = new Player(socket.id, username, x, y, this.obstacle_list, image);
   }
 
   removePlayer(socket) {
@@ -97,7 +96,7 @@ class Game {
 
 	 const obstacleDestroyedBulltes = this.collisionObj.applyObstacleCollisions(this.obstacle_list, this.bullets);
 	 this.bullets = this.bullets.filter(bullet => !obstacleDestroyedBulltes.includes(bullet));
-	 
+
     // Check if any players are dead
     Object.keys(this.sockets).forEach(playerID => {
       const socket = this.sockets[playerID];
@@ -131,24 +130,24 @@ class Game {
 
   createUpdate(player, leaderboard) {
     const nearbyPlayers = Object.values(this.players).filter(
-      p => p !== player, 
+      p => p !== player,
     );
-	 
+
     const nearbyBullets = this.bullets.filter(
       b => b,
     );
-	 
+
 	 const obstacleReturn = this.obstacle_list.filter(
-		o => o,
+      o => o,
 	 );
-	 
+
 
     return {
       t: Date.now(),
       me: player.serializeForUpdate(),
       others: nearbyPlayers.map(p => p.serializeForUpdate()),
       bullets: nearbyBullets.map(b => b.serializeForUpdate()),
-		obstacles: obstacleReturn.map(o => o.serializeForUpdate()),
+      obstacles: obstacleReturn.map(o => o.serializeForUpdate()),
       leaderboard,
     };
   }

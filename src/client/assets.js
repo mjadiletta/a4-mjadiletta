@@ -4,7 +4,7 @@ const ASSET_NAMES = [
   'purple_tank.png',
   'blue_tank.png',
   'bullet.svg',
-  'basic_obsticle.png',
+  'basic_obstacle.png',
 ];
 
 const assets = {};
@@ -15,7 +15,6 @@ function downloadAsset(assetName) {
   return new Promise(resolve => {
     const asset = new Image();
     asset.onload = () => {
-      console.log(`Downloaded ${assetName}`);
       assets[assetName] = asset;
       resolve();
     };

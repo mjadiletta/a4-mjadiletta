@@ -15,9 +15,29 @@
     gtag('js', new Date());
 
     gtag('config', 'UA-58664433-3');
+	 
+		function instructions(){
+			document.getElementById("instructions").style.display = 'block'
+			document.getElementById("instructions").innerHTML = 
+			'<div>How to Start:</div><ul>\
+			<li>Select a color for your tank</li>\
+			<li>Type in a username</li></ul\
+			<div>User Interface:</div><ul>\
+			<li>Use the left and right arrow keys to turn</li>\
+			<li>Use the up and down arrow keys to move forwared or backwards</li>\
+			<li>Use the spacebar to shoot bullets</li></ul>\
+			<div> Type "q" to bring up this prompt"</div>\
+			<button onclick="close_instructions()" style="font-size:1em;">Close Prompt</button>'
+		};
+
+		function close_instructions(){
+			document.getElementById("instructions").style.display = 'none'
+		}
   </script>
 </head>
 <body>
+  <div id="instructions"></div>
+  <script>instructions()</script>
   <canvas id="game-canvas"></canvas>
   <div id="play-menu" class="hidden">
     <h1>Tiny Tanks .io</h1>
@@ -29,7 +49,7 @@
     <hr />
     <p>
       <!-- <br /> -->
-      How to Play: <a href="" target="_blank">Click Here</a>.
+      How to Play: <button onclick="instructions()" style="font-size: .95em; padding:5px 5px 5px 5px;">Click Here</button>.
       <br />
       See the source code on <a href="https://github.com/mjadiletta/a3-mjadiletta-matthew-adiletta" target="_blank">Github</a>.
       <br />
@@ -38,7 +58,7 @@
     <hr />
 	 
 	 <div id="tank_color"> Select Tank Color: 
-		 <select id='selected_color'>
+		 <select id="selected_color">
 		  <option>red</option>
 		  <option>green</option>
 		  <option>blue</option>
@@ -63,14 +83,10 @@
     </table>
   </div>
   
-  
-  
 	<div id="health" class="hidden">
-		<div id="health_header" value=''><strong>User Health</strong></div>
+		<div id="health_header" value=""><strong>User Health</strong></div>
 		<div id="health_number"></div>
 	</div>
-  
-  
   
   <div id="disconnect-modal" class="hidden">
     <div>
@@ -78,6 +94,6 @@
       <hr />
       <button id="reconnect-button">RECONNECT</button>
     </div>
-  </div>
+  </div>	
 </body>
 </html>

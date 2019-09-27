@@ -4,7 +4,7 @@ const Constants = require('../shared/constants');
 
 
 class Player extends ObjectClass {
-  constructor(id, username, x, y, obstacle_list) {
+  constructor(id, username, x, y, obstacle_list, image) {
     super(id, x, y, 0, Constants.PLAYER_SPEED);
     this.username = username;
     this.hp = Constants.PLAYER_MAX_HP;
@@ -15,76 +15,75 @@ class Player extends ObjectClass {
 	 this.obstacles = obstacle_list;
 	 this.oldX = x;
 	 this.oldY = y;
+	 this.image = image;
   }
 
   // Returns a newly created bullet, or null.
   update(dt) {
-    let speed = this.speed
-	 
+    let { speed } = this;
+
 	 // Fire a bullet, if needed
-    if (this.shoot == 1){
-		 speed = speed*.5;
+    if (this.shoot === 1) {
+		 speed *= 0.5;
 		 this.fireCooldown -= dt;
 		 if (this.fireCooldown <= 0) {
-			this.fireCooldown += Constants.PLAYER_FIRE_COOLDOWN;
-			return new Bullet(this.id, this.x, this.y, this.direction);
+        this.fireCooldown += Constants.PLAYER_FIRE_COOLDOWN;
+        return new Bullet(this.id, this.x, this.y, this.direction);
 		 }
 	 }
-	
-	 if(this.drive === 1){
+
+	 if (this.drive === 1) {
 		 this.x += dt * speed * Math.sin(this.direction);
 		 this.y -= dt * speed * Math.cos(this.direction);
 	 }
-	 if (this.drive === -1){
-		this.x += -dt * 1.15 * speed * Math.sin(this.direction);
-		this.y -= -dt * 1.15 * speed * Math.cos(this.direction);
+	 if (this.drive === -1) {
+      this.x += -dt * 1.15 * speed * Math.sin(this.direction);
+      this.y -= -dt * 1.15 * speed * Math.cos(this.direction);
 	 }
-	 
+
     // Make sure the player stays in bounds
-    this.x = Math.max(25, Math.min(Constants.MAP_SIZE_X-25, this.x));
-    this.y = Math.max(25, Math.min(Constants.MAP_SIZE_Y-25, this.y));
-	
+    this.x = Math.max(25, Math.min(Constants.MAP_SIZE_X - 25, this.x));
+    this.y = Math.max(25, Math.min(Constants.MAP_SIZE_Y - 25, this.y));
+
 	 this.avoidObsticles();
-    
+
 
     return null;
   }
-  
-  avoidObsticles(){
+
+  avoidObsticles() {
 	 let overlap = false;
 	 for (let j = 0; j < this.obstacles.length; j++) {
-		if(this.noOverlap(this.obstacles[j])){
-			overlap = true;
-		}
+      if (this.noOverlap(this.obstacles[j])) {
+        overlap = true;
+      }
 	 }
-	 
-	 if(overlap){
-		this.x = this.oldX
-		this.y = this.oldY
-	 }
-	 else {
-		this.oldX = this.x
-		this.oldY = this.y
+
+	 if (overlap) {
+      this.x = this.oldX;
+      this.y = this.oldY;
+	 } else {
+      this.oldX = this.x;
+      this.oldY = this.y;
 	 }
   }
-  
-  noOverlap(obstacle){
-		if(obstacle.containsPoint(this.x + 15, this.y) || 
+
+  noOverlap(obstacle) {
+    if (obstacle.containsPoint(this.x + 15, this.y) ||
 			obstacle.containsPoint(this.x - 15, this.y) ||
 			obstacle.containsPoint(this.x, this.y + 15) ||
-			obstacle.containsPoint(this.x, this.y - 15) )
-		{
-			return true;
-		}
-		return false;
+			obstacle.containsPoint(this.x, this.y - 15)) {
+      return true;
+    }
+    return false;
   }
-  
-  
-	setDirection(dir){
-		this.direction = dir.direction;
-		this.drive = dir.drive;
-		this.shoot = dir.shoot;
-	}
+
+
+  setDirection(dir) {
+    this.direction = dir.direction;
+    this.drive = dir.drive;
+    this.shoot = dir.shoot;
+  }
 
   takeBulletDamage() {
     this.hp -= Constants.BULLET_DAMAGE;
@@ -98,9 +97,10 @@ class Player extends ObjectClass {
     return {
       ...(super.serializeForUpdate()),
       drive: this.drive,
-		direction: this.direction,
-		shoot: this.shoot,
+      direction: this.direction,
+      shoot: this.shoot,
       hp: this.hp,
+      image: this.image,
     };
   }
 }

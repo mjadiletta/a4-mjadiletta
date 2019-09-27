@@ -102,6 +102,19 @@ button:focus {
 	padding: 10px;
 }
 
+#instructions {
+	position: fixed;
+	top: 10px;
+	left: 10px;
+	width: 350px;
+	background-color: rgba(255, 255, 255, 0.5);
+	padding: 10px;
+	bordor-radius: 50px;
+	font-size: 1em;
+	padding: 10px;
+	display:none;
+}
+
 select {
 	padding: 7px;
 	margin: 0px 0px 10px 5px;

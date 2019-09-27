@@ -6,7 +6,7 @@ import { getCurrentState } from './state';
 
 const Constants = require('../shared/constants');
 
-const { PLAYER_RADIUS, PLAYER_MAX_HP, BULLET_RADIUS, MAP_SIZE_X, MAP_SIZE_Y, OBSTACLE_WIDTH, OBSTACLE_HEIGHT} = Constants;
+const { PLAYER_RADIUS, PLAYER_MAX_HP, BULLET_RADIUS, MAP_SIZE_X, MAP_SIZE_Y } = Constants;
 
 // Get the canvas graphics context
 const canvas = document.getElementById('game-canvas');
@@ -16,25 +16,24 @@ setCanvasDimensions();
 window.addEventListener('resize', debounce(40, setCanvasDimensions));
 
 function setCanvasDimensions() {
-  const scaleRatio = Math.max(1, 800 / window.innerWidth);
-  canvas.width = window.innerWidth; //scaleRatio * window.innerWidth;
-  canvas.height = window.innerHeight; //scaleRatio * window.innerHeight;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
 
 function render() {
   const { me, others, bullets, obstacles } = getCurrentState();
-  
+
   if (!me) {
     return;
   }
 
   // Draw background
-  renderBackground(me.x, me.y);
+  renderBackground();
 
   // Draw boundaries
   context.strokeStyle = 'black';
   context.lineWidth = 1;
-  context.strokeRect(canvas.width/2-MAP_SIZE_X/2, canvas.height/2-MAP_SIZE_Y/2, MAP_SIZE_X, MAP_SIZE_Y);
+  context.strokeRect(canvas.width / 2 - MAP_SIZE_X / 2, canvas.height / 2 - MAP_SIZE_Y / 2, MAP_SIZE_X, MAP_SIZE_Y);
 
   // Draw objects on canvas
   renderPlayer(me, me);
@@ -43,13 +42,13 @@ function render() {
   obstacles.forEach(renderObstacle.bind(null, me));
 }
 
-function renderBackground(x, y) {
+function renderBackground() {
   const backgroundX = canvas.width / 2;
   const backgroundY = canvas.height / 2;
   const backgroundGradient = context.createRadialGradient(
     backgroundX,
     backgroundY,
-    canvas.height/2 / 10,
+    canvas.height / 2 / 10,
     backgroundX,
     backgroundY,
     canvas.height / 2,
@@ -62,18 +61,18 @@ function renderBackground(x, y) {
 
 // Renders a ship at the given coordinates
 function renderPlayer(me, player) {
-  const { x, y, direction } = player;
-  const canvasX = x + (canvas.width/2-MAP_SIZE_X/2); //canvas.width / 2 ;//+ x; - me.x;
-  const canvasY = y + (canvas.height/2-MAP_SIZE_Y/2); //canvas.height / 2;//+ y; - me.y;
+  const { x, y, direction, image } = player;
+  const canvasX = x + (canvas.width / 2 - MAP_SIZE_X / 2); // canvas.width / 2 ;//+ x; - me.x;
+  const canvasY = y + (canvas.height / 2 - MAP_SIZE_Y / 2); // canvas.height / 2;//+ y; - me.y;
   updateHealth(me.hp);
 
   // Draw ship
   context.save();
   context.translate(canvasX, canvasY);
-    
+
   context.rotate(direction);
   context.drawImage(
-    getAsset(document.getElementById('health_header').value),
+    getAsset(image),
     -PLAYER_RADIUS,
     -PLAYER_RADIUS,
     PLAYER_RADIUS * 2,
@@ -99,15 +98,15 @@ function renderPlayer(me, player) {
 }
 
 function updateHealth(hp) {
-	document.getElementById('health_number').innerHTML = '<center>- ' + hp + ' -</center>';
-}	
+  document.getElementById('health_number').innerHTML = `<center>- ${hp} -</center>`;
+}
 
 function renderBullet(me, bullet) {
   const { x, y } = bullet;
   context.drawImage(
     getAsset('bullet.svg'),
-	 x + (canvas.width/2-MAP_SIZE_X/2),
-	 y + (canvas.height/2-MAP_SIZE_Y/2), 
+	 x + (canvas.width / 2 - MAP_SIZE_X / 2),
+	 y + (canvas.height / 2 - MAP_SIZE_Y / 2),
     BULLET_RADIUS * 2,
     BULLET_RADIUS * 2,
   );
@@ -115,25 +114,24 @@ function renderBullet(me, bullet) {
 
 function renderObstacle(me, obstacle) {
   const { x, y, direction, width, height } = obstacle;
-  const cX = x + (canvas.width/2-MAP_SIZE_X/2); 
-  const cY = y + (canvas.height/2-MAP_SIZE_Y/2); 
-  
+  const cX = x + (canvas.width / 2 - MAP_SIZE_X / 2);
+  const cY = y + (canvas.height / 2 - MAP_SIZE_Y / 2);
+
   context.save();
-  
+
   context.translate(cX, cY);
   context.rotate(direction);
-  
+
   context.drawImage(
-    getAsset('basic_obsticle.png'),
+    getAsset('basic_obstacle.png'),
 	 0,
 	 0,
     width,
     height,
   );
-  //context.rotate(0);
-  //context.translate(-cX, -cY);
+  // context.rotate(0);
+  // context.translate(-cX, -cY);
   context.restore();
-
 }
 
 function renderMainMenu() {

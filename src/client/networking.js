@@ -30,7 +30,7 @@ export const connect = onGameOver => (
 );
 
 export const play = username => {
-  socket.emit(Constants.MSG_TYPES.JOIN_GAME, username);
+  socket.emit(Constants.MSG_TYPES.JOIN_GAME, username, document.getElementById('health_header').value);
 };
 
 export const updateUser = throttle(20, dir => {
